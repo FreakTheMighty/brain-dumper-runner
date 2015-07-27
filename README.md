@@ -1,3 +1,3 @@
 # Brain Dumper Runner
 
-Docker image an script responsible for running caffe networks
+Docker image and script responsible for running caffe networks
