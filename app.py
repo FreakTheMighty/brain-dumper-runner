@@ -1,13 +1,12 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from werkzeug import secure_filename
-import git
-import sys
 import datetime
 import imp
+import os
 
 app = Flask(__name__, static_url_path='')
 
-app.config['UPLOAD_FOLDER'] = '/brain/inputs/'
+UPLOAD_FOLDER = '/brain/inputs/'
 
 name = 'engine'
 fp, pathname, description = imp.find_module('engine', ['/brain/'])
@@ -25,12 +24,12 @@ def foward():
     for file_key in request.files.keys():
        attached_file = request.files[file_key]
        filename_ = str(datetime.datetime.now()).replace(' ', '_') + \
-           secure_filename(imagefile.filename)
+           secure_filename(attached_file.filename)
        filename = os.path.join(UPLOAD_FOLDER, filename_)
        inputs.append(filename)
        attached_file.save(filename)
 
-    results = engine_.forward(inputs)
+    results = engine_.foward(inputs)
     return jsonify(results)
 
 if __name__ == "__main__":
