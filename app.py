@@ -3,15 +3,21 @@ from werkzeug import secure_filename
 import datetime
 import imp
 import os
+import base_engine
 
 app = Flask(__name__, static_url_path='')
 
-UPLOAD_FOLDER = '/brain/inputs/'
+UPLOAD_FOLDER = os.path.join(base_engine.Engine.BRAIN_DIR, '/inputs/')
+BRAIN_MODULE = os.path.join(base_engine.Engine.BRAIN_DIR, 'engine.py')
 
-name = 'engine'
-fp, pathname, description = imp.find_module('engine', ['/brain/'])
-engine = imp.load_module(name, fp, pathname, description)
-engine_ = engine.Engine()
+engine_ = None
+if os.path.exist(BRAIN_MODULE):
+    name = 'engine'
+    fp, pathname, description = imp.find_module(name, [ base_engine.Engine.BRAIN_DIR ])
+    engine = imp.load_module(name, fp, pathname, description)
+    engine_ = engine.Engine()
+else:
+    engine_ = base_engine
 
 @app.route('/')
 def isalive():
@@ -33,5 +39,5 @@ def foward():
     return jsonify(results)
 
 if __name__ == "__main__":
-    engine_.load()
+    engine_.net = engine_.load()
     app.run(host="0.0.0.0", debug=True)
