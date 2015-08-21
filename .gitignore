@@ -1,1 +1,5 @@
 *.pyc
+*.caffemodel
+*.prototxt
+*.npy
+labels.txt
