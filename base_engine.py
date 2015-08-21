@@ -39,17 +39,22 @@ class Engine(object):
         caffemodel = params.pop('caffemodel')
         label_path = params.pop('labels_file')
         self.labels = []
-        with open(label_path) as f:
-            for line in f:
-                self.labels.append(line.strip())
-        self.labels = np.array(self.labels)
+        if label_path:
+            with open(label_path) as f:
+                for line in f:
+                    self.labels.append(line.strip())
+            self.labels = np.array(self.labels)
 
         return caffe.Classifier(deploy_file, caffemodel, **params)
 
     def foward(self, inputs):
         input_image = caffe.io.load_image(inputs[0])
         scores = self.net.predict([input_image], oversample=True).flatten()
-        indices = (-scores).argsort()[:5]
-        predictions = self.labels[indices]
-        return dict(zip(predictions.tolist(), scores.tolist()))
+        if self.labels is not None:
+            indices = (-scores).argsort()[:5]
+            predictions = self.labels[indices]
+            scores = scores[indices]
+            return {'scores': zip(predictions.tolist(), scores.tolist())}
+        else:
+            return {'scores': scores}
 
